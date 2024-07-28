@@ -1,0 +1,17 @@
+{
+  "name": "",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^4.12.2",
+    "jquery": "^3.7.1",
+    "jquery-ui": "^1.13.3"
+  }
+}
