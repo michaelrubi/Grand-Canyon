@@ -1,25 +1,12 @@
 // Strict Mode
 // "use strict";
 
+// Global Variables
 let theme = $('body').attr('class');
 let weather = '';
 
-$(document).ready(() => {
-    fetchActivities();
-    fetchInfo();
-});
 
-
-$('#forecast').on('click', async () => {
-    try {
-        weather = await fetchWeather();
-
-        theme = setTheme(weather);
-    } catch (error) {
-        console.error(error);
-    }
-});
-
+// Functions
 /**
  * Fetches the weather data from the OpenWeatherMap API and updates the forecast element with the result.
  *
@@ -116,6 +103,11 @@ function fetchActivities() {
     });
 }
 
+/**
+ * Fetches information from the National Park Service API based on the specified parameters.
+ *
+ * @return {Promise} A promise that resolves with the fetched information data or rejects with an error.
+ */
 function fetchInfo() {
     // Set the API URL and parameters
     const apiURL = 'https://developer.nps.gov/api/v1/parks?';
@@ -195,3 +187,56 @@ function fetchInfo() {
         throw error;
     });
 }
+
+/**
+ * Updates the carousel's scroll index based on the given direction.
+ *
+ * @param {string} direction - The direction to scroll the carousel ('left' or 'right').
+ * @return {void} This function does not return a value.
+ */
+function carousel(direction) {
+    // carousel selector
+    const slides = $('#activities .slides');
+    // Set variables for easier maxIndex calculation
+    const scrollIndex = Number.parseInt(slides.css('--scroll-index'), 10);
+    const slideCount = slides.children().length;
+    const slideWidth = slides.find('.slide').outerWidth(true);
+    const viewortWidth = window.innerWidth;
+    const fullSlidesInView = Math.floor(viewortWidth / slideWidth);
+    const slidesInView = (viewortWidth - (fullSlidesInView + 1) * 16 ) / slideWidth;
+    
+    // Calculate new index
+    let newIndex = direction === 'left' ? scrollIndex - 1 : scrollIndex + 1;
+    const maxIndex = Math.floor(slideCount / slidesInView);
+    newIndex = Math.max(0, Math.min(newIndex, maxIndex));
+
+    // Set new scroll index
+    slides.css('--scroll-index', newIndex);
+  }
+
+  function resetCarousel() {
+    const slides = $('#activities .slides');
+    slides.css('--scroll-index', 0);
+}
+
+
+// Event Listeners
+$(document).ready(() => {
+    fetchActivities();
+    fetchInfo();
+});
+
+
+$('#forecast').on('click', async () => {
+    try {
+        weather = await fetchWeather();
+
+        theme = setTheme(weather);
+    } catch (error) {
+        console.error(error);
+    }
+});
+
+$('#activities .right').on('click', () => carousel('right'));
+$('#activities .left').on('click', () => carousel('left'));
+$(window).on('resize', resetCarousel);

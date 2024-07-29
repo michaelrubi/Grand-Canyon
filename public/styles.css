@@ -286,16 +286,17 @@ main>section {
 }
 
 #activities .slides {
+    --scroll-index: 0;
     display: grid;
-    grid-template-columns: repeat(10, minmax(20px, 343px));
+    width: fit-content;
+    grid-template-columns: repeat(10, 1fr);
     gap: clamp(0.5rem, 0.25rem + 1vw, 1rem);
-    overflow-x: scroll;
-    padding-right: 2rem;
+    transform: translateX(calc(-92.5vw * var(--scroll-index)));
+    transition: transform 0.5s ease;
 }
 
 #activities .slide {
-    width: 343px;
-    width: 100%;
+    width: clamp(200px, 85.5vw + 1rem, 343px);
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -312,6 +313,25 @@ main>section {
     object-fit: cover;
     object-position: center;
 }
+
+#activities .slide-nav {
+    width: calc(100vw - 2rem);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-content: center;
+    gap: 1rem;
+}
+
+#activities .slide-nav button {
+    background-color: var(--bg-pri);
+    color: var(--txt-pri);
+    font-size: clamp(1rem, 0.0611rem + 1.2605vw, 1.75rem);
+    font-weight: 600;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
 
 .cards {
     display: grid;
