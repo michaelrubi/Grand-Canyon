@@ -3,8 +3,8 @@
 
 // Global Variables
 let theme = $('body').attr('class');
-let weather = '';
-
+let weather;
+let currentIndex = 0;
 
 // Functions
 /**
@@ -61,7 +61,14 @@ function setTheme(weather, oldTheme = theme) {
     const weatherCurrent = weather.weather[0].main.toLowerCase();
     const newTheme = isDayTime? weatherCurrent : 'night';
     $('body').removeClass(`${oldTheme}`).addClass(`${newTheme}`);
-    isDayTime ? $('header .logo img').attr('src', 'logo.svg') : $('header .logo img').attr('src', 'logoNight.svg');
+    if (isDayTime) {
+        $('header .logo img').attr('src', 'logo.svg');
+        $('footer .logo img').attr('src', 'logoDayFooter.svg');
+        
+    } else {
+        $('header .logo img').attr('src', 'logoNight.svg');
+        $('footer .logo img').attr('src', 'logoNightFooter.svg');
+    }
     return newTheme;
 }
 
@@ -119,6 +126,8 @@ function fetchInfo() {
     const accordionElement = $('#accordion');
     let accordionContent = '';
 
+    const addressElement = $('footer .address');
+
     return $.ajax({
         url: `${apiURL}api_key=${apiKey}&limit=${limit}&parkCode=${parkCode}&stateCode=${stateCode}`,
         dataType: 'json'
@@ -129,7 +138,6 @@ function fetchInfo() {
         const directions = data.data[0].directionsInfo;
         const directionsURL = data.data[0].directionsUrl;
         const operatingHours = data.data[0].operatingHours;
-        const addresses = data.data[0].addresses;
         // Add description
         $('#info .description').html(description);
         // Add entrance fees
@@ -182,6 +190,17 @@ function fetchInfo() {
             active: false,
             heightStyle: "content"
         });
+
+        const address = data.data[0].addresses[0];
+        console.log(address);
+        const addressContent = `
+            <address>
+                <small>${address.line1}<br/>${address.line2}<br/>${address.city}, ${address.stateCode} ${address.postalCode} ${address.countryCode}</small>
+            </address>
+            `;
+        addressElement.html(addressContent);
+        
+
     }).fail((jqXHR) => {
         console.error(jqXHR.responseJSON.status_message);
         throw error;
@@ -189,48 +208,42 @@ function fetchInfo() {
 }
 
 /**
- * Updates the carousel's scroll index based on the given direction.
+ * Updates the position of the carousel based on the current index.
  *
- * @param {string} direction - The direction to scroll the carousel ('left' or 'right').
- * @return {void} This function does not return a value.
+ * @return {void} This function does not return anything.
+ */
+function updateCarousel() {
+    const slides = $('#activities .slides');
+    const slideWidth = $('.slide').outerWidth(true);
+    slides.css('transform', `translateX(-${currentIndex * slideWidth}px)`);
+}
+
+/**
+ * Updates the carousel based on the given direction.
+ *
+ * @param {string} direction - The direction to move the carousel ('right' or 'left').
+ * @return {void} This function does not return anything.
  */
 function carousel(direction) {
-    // carousel selector
     const slides = $('#activities .slides');
-    // Set variables for easier maxIndex calculation
-    const scrollIndex = Number.parseInt(slides.css('--scroll-index'), 10);
     const slideCount = slides.children().length;
-    const slideWidth = slides.find('.slide').outerWidth(true);
-    const viewortWidth = window.innerWidth;
-    const fullSlidesInView = Math.floor(viewortWidth / slideWidth);
-    const slidesInView = (viewortWidth - (fullSlidesInView + 1) * 16 ) / slideWidth;
-    
-    // Calculate new index
-    let newIndex = direction === 'left' ? scrollIndex - 1 : scrollIndex + 1;
-    const maxIndex = Math.floor(slideCount / slidesInView);
-    newIndex = Math.max(0, Math.min(newIndex, maxIndex));
+    const visibleSlides = Math.floor(slides.width() / $('.slide').outerWidth(true));
 
-    // Set new scroll index
-    slides.css('--scroll-index', newIndex);
-  }
-
-  function resetCarousel() {
-    const slides = $('#activities .slides');
-    slides.css('--scroll-index', 0);
+    if (direction === 'right' && currentIndex < slideCount - visibleSlides) {
+        currentIndex++;
+    } else if (direction === 'left' && currentIndex > 0) {
+        currentIndex--;
+    }
+    updateCarousel();
 }
 
 
 // Event Listeners
-$(document).ready(() => {
+$(document).ready(async () => {
     fetchActivities();
     fetchInfo();
-});
-
-
-$('#forecast').on('click', async () => {
     try {
         weather = await fetchWeather();
-
         theme = setTheme(weather);
     } catch (error) {
         console.error(error);
@@ -239,4 +252,4 @@ $('#forecast').on('click', async () => {
 
 $('#activities .right').on('click', () => carousel('right'));
 $('#activities .left').on('click', () => carousel('left'));
-$(window).on('resize', resetCarousel);
+$(window).on('resize', updateCarousel);
