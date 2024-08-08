@@ -450,3 +450,75 @@ footer .links a:focus {
         width: 100%;
     }
 }
+
+/* Matching Game */
+#game {
+    background-color: var(--bg-alt);
+}
+
+#gameBoard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+
+#game .card {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    display: block;
+    color: #FFF0;
+    text-align: center;
+    cursor: pointer;
+    background-color: var(--bg-pri);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 75%;
+    background-color: var(--bg-pri);
+    transition: background-color 0.5s ease;
+}
+
+#game .card:not(.matched):not(.flipped) {
+    background-image: url('logo.svg');
+}
+
+
+#game .card.matched, #game .card.flipped {
+    background-image: var(--bg-img);
+    cursor: default;
+}
+
+#game .card.flipped {
+    background-color: var(--bg-pri);
+}
+
+#game .card.matched {
+    background-color: var(--footer-bg);
+}
+
+#scoreBoard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);    
+    place-items: center;
+    font-size: clamp(1rem, 0.5856rem + 1.768vw, 2rem);
+    gap: 1rem;
+    text-align: center;
+}
+
+#game button {
+    margin-top: .5rem;
+    background-color: var(--bg-pri);
+    color: var(--txt-color);
+    font-size: clamp(1rem, 0.0611rem + 1.2605vw, 1.75rem);
+    font-weight: 600;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+#game button:hover {
+    background-color: var(--txt-pri);
+    color: var(--bg-pri);
+}
